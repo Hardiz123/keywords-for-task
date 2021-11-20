@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const pool = require("./db");
-
+const port = 3000 || process.env.PORT;
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -57,6 +57,6 @@ const createTasks = async (req, callback) => {
 
 
 
-app.listen(5000 || process.env.PORT, () => {
-    console.log("server has started on port 5000");
+app.listen(port, () => {
+    console.log("server has started on port",PORT);
 })
