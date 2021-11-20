@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 // get all tasks
-app.get("/tasks", async(req, res) => {
+app.get("/tasks", async (req, res) => {
     try {
         createTasks(req, (results) => res.json(results));
     } catch (error) {
@@ -22,21 +22,27 @@ const createTasks = async (req, callback) => {
     let results = [];
     let perfectQuery = `SELECT * FROM tasks where(`;
     const allParams = Object.keys(req.query);
-    for(let i=0;i<Object.keys(req.query).length;i++ ) {
-        console.log(req.query[allParams[i]], 'this is it');
-        perfectQuery += `"tasks"."Keyword"  ~* '(\\m${req.query[allParams[i]]}\\M)' AND`
-        const tasks = await pool.query (`SELECT * FROM tasks where "tasks"."Keyword" LIKE '%${req.query[allParams[i]]}%';`);
-        const queryName = req.query[allParams[i]];
-        const task = {[queryName] : tasks};
-        results[i] = task;
-    }
+    if (allParams > 1) {
+        for (let i = 0; i < Object.keys(req.query).length; i++) {
+            console.log(req.query[allParams[i]], 'this is it');
+            perfectQuery += `"tasks"."Keyword"  ~* '(\\m${req.query[allParams[i]]}\\M)' AND`
+            const tasks = await pool.query(`SELECT * FROM tasks where "tasks"."Keyword" LIKE '%${req.query[allParams[i]]}%';`);
+            const queryName = req.query[allParams[i]];
+            const task = { [queryName]: tasks };
+            results[i] = task;
+        }
         perfectQuery = perfectQuery.split(" ").reverse().slice(1).reverse().join(" ");
         perfectQuery += ');';
         perfectQuery = await pool.query(perfectQuery);
-        const task1 = {"final": perfectQuery};
+        const task1 = { "final": perfectQuery };
         results.push(task1);
         console.log(results.length);
         callback(results);
+    }
+    else {
+        const tasks = await pool.query(`SELECT * FROM tasks;`);
+        callback([tasks]);
+    }
 
 }
 
