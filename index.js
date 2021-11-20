@@ -11,6 +11,11 @@ app.use(express.json());
 
 
 // get all tasks
+app.get("/", (req,res) => {
+    res.send("hi there");
+})
+
+
 app.get("/tasks", async (req, res) => {
     try {
         createTasks(req, (results) => res.json(results));
